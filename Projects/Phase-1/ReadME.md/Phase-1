@@ -1,0 +1,161 @@
+# 🧃 PepsiCoDB — Beverage Supply Chain Management System
+
+**Author:** Sanika Hawale – B.Tech Computer Engineer  
+**Phase-1:** Database Design, Table Creation, and Data Population  
+**Organization:** PepsiCo Pvt. Ltd.
+
+---
+
+## 📖 Introduction
+
+The **PepsiCoDB** project is a **relational database management system** designed to handle the complex supply chain operations of a beverage manufacturing company — PepsiCo Pvt. Ltd.  
+It supports departments such as production, inventory, sales, human resources, and logistics.
+
+### 🎯 Real-World Application
+
+- Tracks production batches and raw materials.  
+- Manages inventory across warehouses and suppliers.  
+- Handles customer orders, invoices, and payments.  
+- Maintains employee records, attendance, and maintenance logs.  
+- Supports marketing campaigns and sales performance tracking.
+
+---
+
+## 🧩 Database Design
+
+### List of Tables
+
+| Table Name | Description | Key Attributes |
+|-------------|--------------|----------------|
+| `Locations` | Stores company site addresses | `LocationID`, `LocationName` |
+| `Departments` | Internal divisions like HR, Sales, Production | `DepartmentID`, `DepartmentName`, `ManagerID` |
+| `Employees` | Employee details, salaries, and department links | `EmployeeID`, `FirstName`, `DepartmentID` |
+| `Categories` | Product categories | `CategoryID`, `CategoryName` |
+| `Suppliers` | Vendor information | `SupplierID`, `SupplierName` |
+| `Products` | All PepsiCo products | `ProductID`, `ProductName`, `CategoryID`, `SupplierID` |
+| `Customers` | Registered customers | `CustomerID`, `CustomerName`, `Email` |
+| `Orders` | Order header with customer & employee links | `OrderID`, `CustomerID`, `PaymentStatus` |
+| `OrderDetails` | Line-level details for each order | `OrderDetailID`, `OrderID`, `ProductID`, `Quantity` |
+| `Payments` | Tracks payment status | `PaymentID`, `OrderID`, `PaymentMode`, `Amount` |
+| `Inventory` | Product quantities by warehouse | `InventoryID`, `ProductID`, `QuantityAvailable` |
+| `Warehouses` | Warehouse details | `WarehouseID`, `WarehouseName`, `LocationID` |
+| `RawMaterials` | Inputs used in production | `MaterialID`, `MaterialName`, `SupplierID` |
+| `ProductionBatch` | Production records linking raw materials and employees | `BatchID`, `ProductID`, `ProducedBy` |
+| `QualityCheck` | QC status for production batches | `QCID`, `BatchID`, `Status` |
+| `Distributors` | Regional distributors | `DistributorID`, `DistributorName` |
+| `Retailers` | Retailers under distributors | `RetailerID`, `RetailerName`, `DistributorID` |
+| `Shipments` | Delivery status of orders | `ShipmentID`, `OrderID`, `Status` |
+| `Transport` | Vehicle and driver details | `TransportID`, `VehicleNo`, `CostPerKM` |
+| `Machines` | Machinery and maintenance cycles | `MachineID`, `MachineName`, `Status` |
+| `Maintenance` | Machine maintenance logs | `MaintenanceID`, `MachineID`, `TechnicianID` |
+| `MarketingCampaigns` | Promotional campaign data | `CampaignID`, `CampaignName`, `ManagerID` |
+| `SalesTargets` | Employee-specific sales goals | `TargetID`, `EmployeeID`, `TargetAmount` |
+| `EmployeeAttendance` | Daily attendance records | `AttendanceID`, `EmployeeID`, `Status` |
+| `Feedback` | Customer reviews and ratings | `FeedbackID`, `CustomerID`, `ProductID`, `Rating` |
+
+---
+
+## 🧠 ER Diagram
+
+The following ER diagram represents the logical relationships between the main entities of the PepsiCoDB system:
+
+```mermaid
+erDiagram
+    LOCATIONS ||--o{ DEPARTMENTS : contains
+    DEPARTMENTS ||--o{ EMPLOYEES : employs
+    CATEGORIES ||--o{ PRODUCTS : groups
+    SUPPLIERS ||--o{ PRODUCTS : provides
+    CUSTOMERS ||--o{ ORDERS : places
+    EMPLOYEES ||--o{ ORDERS : processes
+    ORDERS ||--o{ ORDERDETAILS : includes
+    PRODUCTS ||--o{ ORDERDETAILS : involved_in
+    ORDERS ||--o{ PAYMENTS : has
+    PRODUCTS ||--o{ INVENTORY : stored_in
+    WAREHOUSES ||--o{ INVENTORY : holds
+    SUPPLIERS ||--o{ RAWMATERIALS : supplies
+    RAWMATERIALS ||--o{ PRODUCTIONBATCH : used_in
+    EMPLOYEES ||--o{ PRODUCTIONBATCH : supervises
+    PRODUCTIONBATCH ||--o{ QUALITYCHECK : verified_by
+    DISTRIBUTORS ||--o{ RETAILERS : supplies_to
+    ORDERS ||--o{ SHIPMENTS : delivered_by
+    TRANSPORT ||--o{ SHIPMENTS : handles
+    DEPARTMENTS ||--o{ MACHINES : operates
+    MACHINES ||--o{ MAINTENANCE : serviced_in
+    EMPLOYEES ||--o{ MAINTENANCE : performs
+    EMPLOYEES ||--o{ MARKETINGCAMPAIGNS : manages
+    EMPLOYEES ||--o{ SALESTARGETS : assigned
+    EMPLOYEES ||--o{ EMPLOYEEATTENDANCE : records
+    CUSTOMERS ||--o{ FEEDBACK : gives
+    PRODUCTS ||--o{ FEEDBACK : reviewed_in
+⚙️ Queries
+1️⃣ DDL (Data Definition Language)
+sql
+Copy code
+CREATE DATABASE PepsiCoDB;
+USE PepsiCoDB;
+
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50),
+    Gender CHAR(1) CHECK (Gender IN ('M', 'F')),
+    DOB DATE,
+    HireDate DATE NOT NULL,
+    DepartmentID INT,
+    Designation VARCHAR(100),
+    Salary DECIMAL(10,2) CHECK (Salary > 0),
+    Email VARCHAR(100) UNIQUE,
+    Phone VARCHAR(15) UNIQUE,
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);
+2️⃣ DML (Data Manipulation Language)
+sql
+Copy code
+INSERT INTO Employees (FirstName, LastName, Gender, HireDate, DepartmentID, Designation, Salary, Email, Phone)
+VALUES ('Amit', 'Patil', 'M', '2021-04-01', 1, 'Manager', 75000, 'amit@pepsico.com', '9876543210');
+3️⃣ DQL (Data Query Language)
+sql
+Copy code
+SELECT * FROM Employees;
+SELECT * FROM Products;
+SELECT * FROM Orders WHERE PaymentStatus = 'Pending';
+4️⃣ TRUNCATE and DROP Commands
+sql
+Copy code
+TRUNCATE TABLE Feedback;
+DROP TABLE Feedback;
+🖼️ Query Output Screenshots
+Below are sample screenshots of executed queries (SELECT statements):
+
+
+📊 Analysis
+The PepsiCoDB provides a unified structure to track every stage of operations:
+
+From raw materials → production → distribution → retail → customer feedback.
+
+The data relationships ensure traceability, inventory accuracy, and business insights.
+
+Enables analytical reports like:
+
+Total revenue by product category.
+
+Employee performance vs. sales targets.
+
+Machine maintenance frequency.
+
+Customer satisfaction by region.
+
+💡 Reflection
+Challenges Faced
+Ensuring foreign key constraints without circular dependencies.
+
+Designing self-referencing tables like Categories with ParentCategoryID.
+
+Managing 25 interlinked tables with proper normalization.
+
+Solutions Implemented
+Created a strict order of table creation to avoid FK errors.
+
+Added default values and CHECK constraints for data integrity.
+
+Used ER modeling to visualize all relationships before coding.
